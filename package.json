@@ -1,0 +1,19 @@
+{
+  "name": "fccBarChart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server",
+    "server": "node server"
+  },
+  "proxy": "http://localhost:5555",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  }
+}
