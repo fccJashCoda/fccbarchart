@@ -22,3 +22,10 @@ article {
 .bar:hover {
   fill: red;
 }
+
+.tooltip {
+  display: block;
+  width: 100px;
+  height: 50px;
+  background: 'red';
+}
