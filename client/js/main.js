@@ -9,10 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   fetch(url)
     .then((response) => response.json())
     .then(({ data }) => {
-      console.log(data);
-      // const dataset = data.data;
-      const years = [];
-
       const dataset = [];
 
       const getQuarter = (date) => {
@@ -35,18 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return quarter;
       };
 
-      // for (let i = 0; i < 20; i++) {
-      //   const set = data.data[i];
-      //   const dataobj = {
-      //     date: set[0],
-      //     year: set[0].slice(0, 4),
-      //     quarter: getQuarter(set[0].slice(5)),
-      //     gdp: set[1],
-      //   };
-      //   dataset.push(dataobj);
-      // }
       data.data.forEach((set) => {
         const dataobj = {
+          // date: new Date(set[0]),
           date: set[0],
           year: set[0].slice(0, 4),
           quarter: getQuarter(set[0].slice(5)),
@@ -55,34 +42,22 @@ document.addEventListener('DOMContentLoaded', () => {
         dataset.push(dataobj);
       });
 
+      const testData = dataset.map((set) => new Date(set.date));
+
       const timeScale = d3
         .scaleTime()
-        .domain([
-          new Date(dataset[0].date),
-          new Date(dataset[dataset.length - 1].date),
-        ])
+        .domain([d3.min(testData), new Date('2016')])
         .range([padding, width]);
-
-      console.log(dataset[dataset.length - 1]);
-
-      console.log('timescale test', timeScale(new Date('1947-01-01')));
-      console.log('timescale test', timeScale(new Date('1957-01-01')));
-      console.log('timescale test', timeScale(new Date('1997-01-01')));
-      console.log('timescale test', timeScale(new Date('2000-01-01')));
-      console.log('timescale test', timeScale(new Date('2015-07-01')));
 
       const xScale = d3
         .scaleBand()
         .domain(dataset.map((d) => d.date))
         .range([padding, width]);
-      // .padding(0.1);
-      console.log('xScale test: ', xScale('2014-10-01'));
 
       const yScale = d3
         .scaleLinear()
         .domain([0, d3.max(dataset, (d) => d.gdp)])
         .range([height - padding, 0]);
-      console.log('yscale: ', yScale);
 
       const xAxis = d3.axisBottom(timeScale);
       const yAxis = d3.axisLeft(yScale);
@@ -101,9 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
         .enter()
         .append('rect')
         .attr('class', 'bar')
-        .attr('x', (d, i) => timeScale(new Date(d.date)))
+        .attr('x', (d, i) => timeScale(testData[i]))
         .attr('y', (d) => yScale(d.gdp))
-        .attr('width', 3)
+        .attr('width', width / dataset.length)
         .attr('height', (d) => yScale(0) - yScale(d.gdp))
         .attr('fill', 'steelblue')
         .attr('data-date', (d) => d.date)
