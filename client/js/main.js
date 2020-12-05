@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json';
     'http://localhost:5555/jsondata';
   const width = 850;
-  // const height = 550;
   const height = 450;
   const padding = 50;
 
@@ -16,41 +15,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const dataset = [];
 
+      const getQuarter = (date) => {
+        const month = parseInt(date);
+        let quarter;
+        switch (true) {
+          case month > 9:
+            quarter = 'Q4';
+            break;
+          case month > 6:
+            quarter = 'Q3';
+            break;
+          case month > 3:
+            quarter = 'Q2';
+            break;
+          default:
+            quarter = 'Q1';
+            break;
+        }
+        return quarter;
+      };
+
+      // for (let i = 0; i < 20; i++) {
+      //   const set = data.data[i];
+      //   const dataobj = {
+      //     date: set[0],
+      //     year: set[0].slice(0, 4),
+      //     quarter: getQuarter(set[0].slice(5)),
+      //     gdp: set[1],
+      //   };
+      //   dataset.push(dataobj);
+      // }
       data.data.forEach((set) => {
         const dataobj = {
           date: set[0],
           year: set[0].slice(0, 4),
-          q: set[0].slice(5),
+          quarter: getQuarter(set[0].slice(5)),
           gdp: set[1],
         };
         dataset.push(dataobj);
       });
 
-      console.log(dataset);
+      const timeScale = d3
+        .scaleTime()
+        .domain([
+          new Date(dataset[0].date),
+          new Date(dataset[dataset.length - 1].date),
+        ])
+        .range([padding, width]);
 
-      // dataset.forEach((set) => {
-      //   const year = set[0].slice(0, 4);
-      //   if (!years.includes(year)) {
-      //     years.push(year);
-      //   }
-      // });
-      // console.log(years);
+      console.log(dataset[dataset.length - 1]);
+
+      console.log('timescale test', timeScale(new Date('1947-01-01')));
+      console.log('timescale test', timeScale(new Date('1957-01-01')));
+      console.log('timescale test', timeScale(new Date('1997-01-01')));
+      console.log('timescale test', timeScale(new Date('2000-01-01')));
+      console.log('timescale test', timeScale(new Date('2015-07-01')));
 
       const xScale = d3
         .scaleBand()
-        .domain(d3.range(dataset.length))
-        .range([padding, width])
-        .padding(0.1);
+        .domain(dataset.map((d) => d.date))
+        .range([padding, width]);
+      // .padding(0.1);
+      console.log('xScale test: ', xScale('2014-10-01'));
 
       const yScale = d3
         .scaleLinear()
         .domain([0, d3.max(dataset, (d) => d.gdp)])
-        // .domain([0, d3.max(dataset, (d) => d[1])])
         .range([height - padding, 0]);
       console.log('yscale: ', yScale);
 
-      const xAxis = d3.axisBottom(xScale).tickFormat((i) => dataset[i].date);
-      // const xAxis = d3.axisBottom(xScale).ticks(2);
+      const xAxis = d3.axisBottom(timeScale);
       const yAxis = d3.axisLeft(yScale);
       console.log('xAxis:', xAxis);
 
@@ -66,21 +100,16 @@ document.addEventListener('DOMContentLoaded', () => {
         .data(dataset)
         .enter()
         .append('rect')
-        .attr('x', (d, i) => xScale(i))
+        .attr('class', 'bar')
+        .attr('x', (d, i) => timeScale(new Date(d.date)))
         .attr('y', (d) => yScale(d.gdp))
-        // .attr('y', (d) => yScale(d[1]))
         .attr('width', 3)
         .attr('height', (d) => yScale(0) - yScale(d.gdp))
-        // .attr('height', (d) => yScale(0) - yScale(d[1]))
         .attr('fill', 'steelblue')
-        .attr('class', 'bar')
         .attr('data-date', (d) => d.date)
-        // .attr('data-date', (d) => d[0])
         .attr('data-gdp', (d) => d.gdp)
-        // .attr('data-gdp', (d) => d[1])
         .append('title')
-        // .attr('class', 'tooltip')
-        .text((d) => d.year);
+        .text((d) => `${d.year} ${d.quarter} \n$${d.gdp} Billion`);
 
       svg
         .append('g')
