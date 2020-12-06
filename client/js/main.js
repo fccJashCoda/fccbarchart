@@ -1,6 +1,6 @@
 // TODO
-// [] finsih html scaffolding
-// [] finsih styling
+// [x] finsih html scaffolding
+// [x] finsih styling
 // [x] add a label to the chart
 // [] make it responsive
 // [] build it on codepen
@@ -169,7 +169,7 @@
         .attr('x', -HEIGHT / 2 - 30)
         .attr('y', 15)
         .attr('transform', `rotate(-90)`)
-        .text('U.S. GDP in Billions');
+        .text('Units: Billions of Dollars');
 
       svg
         .append('text')
