@@ -7,7 +7,32 @@
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
-    <article></article>
+    <main>
+      <form>
+        <div>
+          <label for="start">FROM:</label>
+          <input
+            type="number"
+            id="start"
+            placeholder="1947"
+            min="1947"
+            max="2015"
+          />
+        </div>
+        <div>
+          <label for="end">TO:</label>
+          <input
+            type="number"
+            id="end"
+            placeholder="2015"
+            min="1947"
+            max="2015"
+          />
+        </div>
+        <button type="submit" id="showData">Show Data</button>
+      </form>
+      <article id="svgContainer"></article>
+    </main>
     <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
     <script src="https://d3js.org/d3.v5.js"></script>
     <script src="js/main.js"></script>

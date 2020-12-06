@@ -1,37 +1,63 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const url =
-    // 'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json';
-    'http://localhost:5555/jsondata';
-  const width = 850;
-  const height = 450;
-  const padding = 50;
+(() => {
+  window.addEventListener('DOMContentLoaded', async () => {
+    // Constants
+    const URL =
+      // 'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json';
+      'http://localhost:5555/jsondata';
+    const WIDTH = 850;
+    const HEIGHT = 450;
+    const PADDING = 50;
 
-  fetch(url)
-    .then((response) => response.json())
-    .then(({ data }) => {
-      const dataset = [];
+    // DOM queries
+    const svgContainer = document.getElementById('svgContainer');
+    const start = document.getElementById('start');
+    const end = document.getElementById('end');
+    const showDataBtn = document.getElementById('showData');
+
+    // EventListeners
+    showDataBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      displayData();
+    });
+
+    // Init
+    const rawDataSet = await buildRawData();
+    displayData();
+
+    // Function Declarations
+    async function buildRawData() {
+      // API call
+      const fetchData = async () => {
+        try {
+          const response = await fetch(URL);
+          const { data } = await response.json();
+          return data;
+        } catch (err) {
+          return {};
+        }
+      };
 
       const getQuarter = (date) => {
         const month = parseInt(date);
         let quarter;
-        switch (true) {
-          case month > 9:
-            quarter = 'Q4';
-            break;
-          case month > 6:
-            quarter = 'Q3';
-            break;
-          case month > 3:
-            quarter = 'Q2';
-            break;
-          default:
-            quarter = 'Q1';
-            break;
+
+        if (month > 9) {
+          quarter = 'Q4';
+        } else if (month > 6) {
+          quarter = 'Q3';
+        } else if (month > 3) {
+          quarter = 'Q2';
+        } else {
+          quarter = 'Q1';
         }
         return quarter;
       };
 
-      data.data.forEach((set) => {
+      const apiResponse = await fetchData();
+      if (!Object.keys(apiResponse).length) return [];
+
+      const dataset = [];
+      apiResponse.data.forEach((set) => {
         const dataobj = {
           date: set[0],
           year: set[0].slice(0, 4),
@@ -41,38 +67,53 @@ document.addEventListener('DOMContentLoaded', () => {
         dataset.push(dataobj);
       });
 
-      const testData = dataset.map((set) => new Date(set.date));
-      const exper = new Date(d3.max(testData).getTime());
-      exper.setFullYear(exper.getFullYear() + 1);
+      return dataset;
+    }
 
-      console.log('d3 max testData ', exper);
-      const timeScale = d3
-        .scaleTime()
-        .domain([d3.min(testData), exper])
-        // .domain([d3.min(testData), new Date('2016')])
-        .range([padding, width]);
+    function getDataRangeFromUserInput() {
+      let startValue =
+        start.value >= 1947 && start.value <= 2015 ? Number(start.value) : 1947;
+      let endValue =
+        end.value >= 1947 && end.value <= 2015 ? Number(end.value) : 2015;
+
+      if (startValue > endValue) {
+        startValue = 1947;
+      }
+
+      const dataset = rawDataSet.filter(
+        (data) => data.year >= startValue && data.year <= endValue
+      );
+
+      return dataset;
+    }
+
+    function displayData() {
+      svgContainer.innerHTML = '';
+      const dataset = getDataRangeFromUserInput();
+
+      const timeData = dataset.map((set) => new Date(set.date));
+
+      const maxDate = new Date(d3.max(timeData).getTime());
+      maxDate.setMonth(maxDate.getMonth() + 3);
 
       const xScale = d3
-        .scaleBand()
-        .domain(dataset.map((d) => d.date))
-        .range([padding, width]);
+        .scaleTime()
+        .domain([d3.min(timeData), maxDate])
+        .range([PADDING, WIDTH]);
 
       const yScale = d3
         .scaleLinear()
         .domain([0, d3.max(dataset, (d) => d.gdp)])
-        .range([height - padding, 0]);
+        .range([HEIGHT - PADDING, 0]);
 
-      const xAxis = d3.axisBottom(timeScale);
-      const yAxis = d3.axisLeft(yScale);
+      const tooltip = d3.select('article').append('div').attr('id', 'tooltip');
 
       const svg = d3
         .select('article')
         .append('svg')
         .attr('id', 'title')
-        .attr('width', width)
-        .attr('height', height);
-
-      const tooltip = d3.select('article').append('div').attr('id', 'tooltip');
+        .attr('width', WIDTH)
+        .attr('height', HEIGHT);
 
       svg
         .selectAll('rect')
@@ -81,9 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
         .append('rect')
         .style('position', 'relative')
         .attr('class', 'bar')
-        .attr('x', (d, i) => timeScale(testData[i]))
+        .attr('x', (d, i) => xScale(timeData[i]))
         .attr('y', (d) => yScale(d.gdp))
-        .attr('width', width / dataset.length)
+        .attr('width', WIDTH / dataset.length)
         .attr('height', (d) => yScale(0) - yScale(d.gdp))
         .attr('fill', 'steelblue')
         .attr('data-date', (d) => d.date)
@@ -91,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .on('mouseover', (d) => {
           tooltip
             .html(`${d.year} ${d.quarter} <br> $${d.gdp} Billion`)
-            .style('left', `${d3.event.pageX - 180}px`)
+            .style('left', `${d3.event.pageX - 340}px`)
             .attr('data-date', d.date)
             .attr('data-gdp', d.gdp)
             .style('visibility', 'visible');
@@ -100,30 +141,21 @@ document.addEventListener('DOMContentLoaded', () => {
           tooltip.style('visibility', 'hidden');
         });
 
+      // add axis bars
+      const xAxis = d3.axisBottom(xScale);
+      const yAxis = d3.axisLeft(yScale);
+
       svg
         .append('g')
         .attr('id', 'x-axis')
-        .attr('transform', `translate(0,${height - padding})`)
+        .attr('transform', `translate(0,${HEIGHT - PADDING})`)
         .call(xAxis);
 
       svg
         .append('g')
         .attr('id', 'y-axis')
-        .attr('transform', `translate(${padding}, 0)`)
+        .attr('transform', `translate(${PADDING}, 0)`)
         .call(yAxis);
-    })
-    .catch((err) => console.error(err));
-});
-
-const sugar = 'sugar';
-
-(() => {
-  let data;
-
-  window.addEventListener('DOMContentLoaded', async () => {
-    const response = await fetch('http://localhost:5555/jsondata');
-    const fly = await response.json();
-    data = 'noodle';
+    }
   });
-  if (data) console.log(data);
 })();

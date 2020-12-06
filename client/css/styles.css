@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@200;400;600;700&display=swap');
+
 * {
   box-sizing: border-box;
 }
@@ -8,15 +10,26 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-article {
+main {
   width: 1200px;
   height: 600px;
   background: #fff;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  width: 850px;
+  margin-left: 1em;
+  margin-bottom: 1em;
 }
 
 .bar:hover {
