@@ -17,12 +17,12 @@
     // EventListeners
     showDataBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      displayData();
+      renderData();
     });
 
     // Init
     const rawDataSet = await buildRawData();
-    displayData();
+    renderData();
 
     // Function Declarations
     async function buildRawData() {
@@ -87,7 +87,7 @@
       return dataset;
     }
 
-    function displayData() {
+    function renderData() {
       svgContainer.innerHTML = '';
       const dataset = getDataRangeFromUserInput();
 
@@ -126,13 +126,13 @@
         .attr('y', (d) => yScale(d.gdp))
         .attr('width', WIDTH / dataset.length)
         .attr('height', (d) => yScale(0) - yScale(d.gdp))
-        .attr('fill', 'steelblue')
         .attr('data-date', (d) => d.date)
         .attr('data-gdp', (d) => d.gdp)
-        .on('mouseover', (d) => {
+        .on('mouseover', (d, i) => {
           tooltip
             .html(`${d.year} ${d.quarter} <br> $${d.gdp} Billion`)
-            .style('left', `${d3.event.pageX - 340}px`)
+            // .style('left', `${d3.event.pageX}px`)
+            .style('left', `${xScale(timeData[i]) + 20}px`)
             .attr('data-date', d.date)
             .attr('data-gdp', d.gdp)
             .style('visibility', 'visible');

@@ -1,11 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@200;400;600;700&display=swap');
 
+:root {
+  --body-bg-color: #333;
+  --main-bg-color: #fff;
+  --tooltip-bg-color: #333;
+  --tooltip-font-color: gold;
+  --bar-color: steelblue;
+  --bar-hover-color: gold;
+  --btn-font-color: #fff;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
-  background: #333;
+  background: var(--body-bg-color);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,8 +42,16 @@ form {
   margin-bottom: 1em;
 }
 
+.inputBox {
+  align-self: center;
+}
+
+.bar {
+  fill: var(--bar-color);
+}
+
 .bar:hover {
-  fill: gold;
+  fill: var(--bar-hover-color);
 }
 
 #tooltip {
@@ -42,11 +60,20 @@ form {
   visibility: hidden;
   width: 150px;
   height: 55px;
-  background-color: rgba(51, 51, 51, 0.75);
-  color: gold;
+  background-color: var(--tooltip-bg-color);
+  color: var(--tooltip-font-color);
   padding: 0.5em;
 }
 
 article {
   position: relative;
+}
+
+#showData {
+  cursor: pointer;
+  background: var(--bar-color);
+  border: none;
+  padding: 1em;
+  border-radius: 3px;
+  color: var(--btn-font-color);
 }
