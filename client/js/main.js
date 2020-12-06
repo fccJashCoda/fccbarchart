@@ -1,12 +1,19 @@
+// TODO
+// [] finsih html scaffolding
+// [] finsih styling
+// [x] add a label to the chart
+// [] make it responsive
+// [] build it on codepen
+
 (() => {
   window.addEventListener('DOMContentLoaded', async () => {
     // Constants
     const URL =
       // 'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json';
       'http://localhost:5555/jsondata';
-    const WIDTH = 850;
+    const WIDTH = 860;
     const HEIGHT = 450;
-    const PADDING = 50;
+    const PADDING = 60;
 
     // DOM queries
     const svgContainer = document.getElementById('svgContainer');
@@ -31,6 +38,7 @@
         try {
           const response = await fetch(URL);
           const { data } = await response.json();
+          console.log(data);
           return data;
         } catch (err) {
           return {};
@@ -131,7 +139,6 @@
         .on('mouseover', (d, i) => {
           tooltip
             .html(`${d.year} ${d.quarter} <br> $${d.gdp} Billion`)
-            // .style('left', `${d3.event.pageX}px`)
             .style('left', `${xScale(timeData[i]) + 20}px`)
             .attr('data-date', d.date)
             .attr('data-gdp', d.gdp)
@@ -156,6 +163,25 @@
         .attr('id', 'y-axis')
         .attr('transform', `translate(${PADDING}, 0)`)
         .call(yAxis);
+
+      svg
+        .append('text')
+        .attr('x', -HEIGHT / 2 - 30)
+        .attr('y', 15)
+        .attr('transform', `rotate(-90)`)
+        .text('U.S. GDP in Billions');
+
+      svg
+        .append('text')
+        .attr('x', WIDTH / 2 - 80)
+        .attr('y', HEIGHT - 10)
+        .text(
+          `${
+            start.value === end.value
+              ? `Data from ${start.value}`
+              : `Data from ${start.value} to ${end.value}`
+          }`
+        );
     }
   });
 })();

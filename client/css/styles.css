@@ -8,6 +8,7 @@
   --bar-color: steelblue;
   --bar-hover-color: gold;
   --btn-font-color: #fff;
+  --axis-font-color: #000;
 }
 
 * {
@@ -63,6 +64,14 @@ form {
   background-color: var(--tooltip-bg-color);
   color: var(--tooltip-font-color);
   padding: 0.5em;
+}
+
+g {
+  color: var(--axis-font-color);
+}
+
+text {
+  fill: var(--axis-font-color);
 }
 
 article {
