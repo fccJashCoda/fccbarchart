@@ -3,15 +3,15 @@
 // [x] finsih styling
 // [x] add a label to the chart
 // [x] add fading effect to tooltip to diminish flicker
-// [] make it responsive
+// [x] make it responsive
 // [] build it on codepen
 
 (() => {
   window.addEventListener('DOMContentLoaded', async () => {
     // Constants
     const URL =
-      // 'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json';
-      'http://localhost:5555/jsondata';
+      'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json';
+    // 'http://localhost:5555/jsondata';
     const WIDTH = 860;
     const HEIGHT = 450;
     const PADDING = 60;
@@ -38,8 +38,7 @@
       const _fetchData = async () => {
         try {
           const response = await fetch(URL);
-          const { data } = await response.json();
-          console.log(data);
+          const data = await response.json();
           return data;
         } catch (err) {
           return {};
@@ -63,6 +62,7 @@
       };
 
       const apiResponse = await _fetchData();
+      console.log('api response', apiResponse);
       if (!Object.keys(apiResponse).length) return [];
 
       const dataset = [];
@@ -103,17 +103,16 @@
       const timeData = dataset.map((set) => new Date(set.date));
 
       const maxDate = new Date(d3.max(timeData).getTime());
-      maxDate.setMonth(maxDate.getMonth() + 3);
 
       const xScale = d3
         .scaleTime()
         .domain([d3.min(timeData), maxDate])
-        .range([PADDING, WIDTH]);
+        .range([PADDING, WIDTH - 10]);
 
       const yScale = d3
         .scaleLinear()
         .domain([0, d3.max(dataset, (d) => d.gdp)])
-        .range([HEIGHT - PADDING, 0]);
+        .range([HEIGHT - PADDING, 10]);
 
       const tooltip = d3
         .select('article')
