@@ -2,6 +2,7 @@
 // [x] finsih html scaffolding
 // [x] finsih styling
 // [x] add a label to the chart
+// [x] add fading effect to tooltip to diminish flicker
 // [] make it responsive
 // [] build it on codepen
 
@@ -28,13 +29,13 @@
     });
 
     // Init
-    const rawDataSet = await buildRawData();
+    const rawDataset = await buildRawData();
     renderData();
 
     // Function Declarations
     async function buildRawData() {
       // API call
-      const fetchData = async () => {
+      const _fetchData = async () => {
         try {
           const response = await fetch(URL);
           const { data } = await response.json();
@@ -45,7 +46,7 @@
         }
       };
 
-      const getQuarter = (date) => {
+      const _getQuarter = (date) => {
         const month = parseInt(date);
         let quarter;
 
@@ -61,7 +62,7 @@
         return quarter;
       };
 
-      const apiResponse = await fetchData();
+      const apiResponse = await _fetchData();
       if (!Object.keys(apiResponse).length) return [];
 
       const dataset = [];
@@ -69,7 +70,7 @@
         const dataobj = {
           date: set[0],
           year: set[0].slice(0, 4),
-          quarter: getQuarter(set[0].slice(5)),
+          quarter: _getQuarter(set[0].slice(5)),
           gdp: set[1],
         };
         dataset.push(dataobj);
@@ -88,7 +89,7 @@
         startValue = 1947;
       }
 
-      const dataset = rawDataSet.filter(
+      const dataset = rawDataset.filter(
         (data) => data.year >= startValue && data.year <= endValue
       );
 
@@ -114,14 +115,19 @@
         .domain([0, d3.max(dataset, (d) => d.gdp)])
         .range([HEIGHT - PADDING, 0]);
 
-      const tooltip = d3.select('article').append('div').attr('id', 'tooltip');
+      const tooltip = d3
+        .select('article')
+        .append('div')
+        .attr('id', 'tooltip')
+        .attr('class', 'invisible');
 
       const svg = d3
         .select('article')
         .append('svg')
         .attr('id', 'title')
         .attr('width', WIDTH)
-        .attr('height', HEIGHT);
+        .attr('height', HEIGHT)
+        .attr('viewBox', '0 0 860 450');
 
       svg
         .selectAll('rect')
@@ -142,10 +148,10 @@
             .style('left', `${xScale(timeData[i]) + 20}px`)
             .attr('data-date', d.date)
             .attr('data-gdp', d.gdp)
-            .style('visibility', 'visible');
+            .attr('class', 'fade-in');
         })
         .on('mouseout', () => {
-          tooltip.style('visibility', 'hidden');
+          tooltip.attr('class', 'invisible');
         });
 
       // add axis bars

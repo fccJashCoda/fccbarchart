@@ -18,6 +18,7 @@
 }
 
 body {
+  margin: 0;
   background: var(--body-bg-color);
   display: flex;
   justify-content: center;
@@ -44,8 +45,6 @@ form {
   justify-content: center;
   gap: 1em;
   width: 850px;
-  margin-left: 1em;
-  margin-bottom: 1em;
 }
 
 .inputBox {
@@ -63,13 +62,28 @@ form {
 #tooltip {
   position: absolute;
   top: 300px;
-  visibility: hidden;
   width: 150px;
   height: 55px;
   background-color: var(--tooltip-bg-color);
   color: var(--tooltip-font-color);
   padding: 0.5em;
   box-shadow: 3px 3px rgba(0, 0, 0, 0.5);
+}
+
+.fade-in {
+  animation: fadein ease-in 200ms;
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+.invisible {
+  opacity: 0;
 }
 
 g {
@@ -102,4 +116,57 @@ a:visited {
 
 article {
   min-height: 454px;
+}
+
+@media (max-width: 400px) {
+  main {
+    width: 100%;
+    padding: 0.3em;
+  }
+
+  form {
+    flex-direction: column;
+    width: 60%;
+  }
+
+  article {
+    min-height: 0;
+    margin-top: 1em;
+  }
+
+  svg {
+    width: 100%;
+    height: 60%;
+  }
+  #tooltip {
+    display: none;
+  }
+}
+
+@media (max-height: 400px) {
+  body {
+    height: 100%;
+  }
+  main {
+    width: 100%;
+    padding: 0.3em;
+  }
+
+  article {
+    min-height: 0;
+    margin-top: 1em;
+  }
+
+  form {
+    width: 100%;
+  }
+
+  svg {
+    width: 100%;
+    height: 85%;
+  }
+
+  #tooltip {
+    display: none;
+  }
 }
